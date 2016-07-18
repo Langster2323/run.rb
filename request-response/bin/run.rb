@@ -49,7 +49,7 @@ loop do
   when 'q' then puts "Goodbye!"; exit
   when 'h'
     puts "A valid HTTP Request looks like:"
-    puts "\t'GET http://localhost:3000/students HTTP/1.1'"
+    puts "\t'GET http://localhost:3000/users HTTP/1.1'"
     puts "Read more at : http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html"
   else
     @request = parse(raw_request)
@@ -57,24 +57,86 @@ loop do
     # Use the @request and @params ivars to full the request and
     # return an appropriate response
 
-    # YOUR CODE GOES BELOW HERE
-    puts @request.inspect
 
-
-
-    users = [{:first_name => "Ahkeem", :last_name => "Lang", :age => "23"},
-      {:first_name => "Matt", :last_name => "Saz", :age => "22"},
-      {:first_name => "Lexis", :last_name => "Corona", :age => "24"},
-      {:first_name => "Paul", :last_name => "Varsco", :age => "38"},
-      {:first_name => "Melissa", :last_name => "Soul", :age => "55"}]
-
-      if "users" == users
-        users.each.with_index do |user, index|
-          print  :params=>{:resource=>"users", :id=>nil, :action=>nil}
-        end
-      elsif
-        print  :params=>{:resource=>"users", :id=>nil, :action=>nil}
+    if @params[:id]
+      if users.count < @params[:id].to_i
+        puts "Not a valid input"
+      else
+        puts users[@params[:id].to_i - 1]
       end
-    # YOUR CODE GOES ABOVE HERE  ^
+
+    elsif @params.has_value?("users")
+      puts users
+    end
   end
 end
+    # YOUR CODE GOES BELOW HERE
+    puts @request.inspect
+    class User
+      attr_reader :first_name, :last_name, :age
+      def initialize(first_name, last_name, age)
+        @first_name = first_name
+        @last_name = last_name
+        @age = age
+      end
+    end
+
+OK = "200 OK"
+NOT_FOUND = "404 NOT FOUND"
+
+def response_ok
+  puts OK
+end
+
+
+if url.nil? || url.length.zero?
+  raise "No input given"
+else
+users = [{first_name: "Ahkeem", last_name: "Lang", age: "23"},
+  {first_name: "Matt", last_name: "Saz", age: "22"},
+  {first_name: "Lexis", last_name: "Corona", age: "24"},
+  {first_name: "Paul", last_name: "Varsco", age: "38"},
+  {first_name: "Melissa", last_name: "Soul", age: "55"}]
+  begin
+    response = parser.parse(url)
+    if response[:resource] == "random"
+      response_body = users.sample
+
+      response_ok
+      puts response_body
+
+    elsif response[:resource] == "users"
+      if response[:id]
+
+        if response[:action] == "upcase"
+          response_body = get_user(users, response[:id]).upcase
+        elsif response[:action].nil?
+          response_body = get_user(users, response[:id])
+        end
+
+        response_ok
+        puts response_body
+      else
+        response_ok
+        users.each.with_index do |user, index|
+          puts "#{index + 1} - #{user}"
+        end
+      end
+    else
+      puts NOT_FOUND
+    end
+  end
+end
+
+      # I can't recall what I was trying to here. I wish I used the README which
+      #was required of me to use.
+      # if "users" == users
+      #   users.each.with_index do |user, index|
+      #     print  :params=>{:resource=>users, :id=>nil, :action=>nil}
+      #   end
+      # elsif
+      #   print  :params=>{:resource=>users, :id=>nil, :action=>nil}
+      # else
+      #   NOT_FOUND
+      # end
+    # YOUR CODE GOES ABOVE HERE  ^
